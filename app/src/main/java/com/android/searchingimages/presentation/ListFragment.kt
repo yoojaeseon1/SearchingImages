@@ -1,13 +1,18 @@
 package com.android.searchingimages.presentation
 
+import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
+import androidx.core.content.getSystemService
+import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.RecyclerView
 import com.android.searchingimages.R
 import com.android.searchingimages.data.ContentRepository
 import com.android.searchingimages.databinding.FragmentListBinding
@@ -31,12 +36,28 @@ class ListFragment : Fragment() {
     private var _binding: FragmentListBinding? = null
     private val binding get() = _binding!!
 
-    private val contentRepository: ContentRepository by lazy{
-        ContentRepository()
-    }
+
 
     private val viewModel: MainViewModel by lazy {
-        MainViewModel(contentRepository)
+        MainViewModel()
+    }
+
+    private val contentAdapter: ContentListAdapter by lazy{
+        ContentListAdapter{ contentItem, holder ->
+            viewModel.saveFavorite(requireActivity(), contentItem)
+            contentItem.isFavorite = true
+
+            when(holder) {
+                is ContentListAdapter.ImageHolder -> {
+                    val castedHolder = holder as ContentListAdapter.ImageHolder
+                    castedHolder.favorite.isVisible = true
+                }
+                else -> {
+                    val castedHolder = holder as ContentListAdapter.VideoHolder
+                    castedHolder.favorite.isVisible = true
+                }
+            }
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,20 +75,65 @@ class ListFragment : Fragment() {
         // Inflate the layout for this fragment
         _binding = DataBindingUtil.inflate(inflater, R.layout.fragment_list, container, false)
 //        return inflater.inflate(R.layout.fragment_list, container, false)
+
+        binding.recyclerViewSearchResult.adapter = contentAdapter
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        Log.d("ListFragment", "onViewCreated")
+
+        binding.etSearch.setText(viewModel.getSearchKeyword(requireActivity()))
+
+        binding.recyclerViewSearchResult.addOnScrollListener(object : RecyclerView.OnScrollListener(){
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
+
+                    if(!recyclerView.canScrollVertically(1)) {
+                        Log.d("ListFragment", "end scroll")
+                        viewModel.addSearchResults()
+                        Log.d("ListFragment", "searchResults size = ${viewModel.searchResults.value?.size}")
+
+                        contentAdapter.submitList(viewModel.searchResults.value?.toMutableList())
+                    }
+
+                }
+            }
+        )
+
+        binding.btnScrollTop.setOnClickListener {
+            binding.recyclerViewSearchResult.smoothScrollToPosition(0)
+        }
+
         binding.btnSearchOk.setOnClickListener {
             val keyword = binding.etSearch.text.toString()
+
+            viewModel.insertSearchKeyword(requireActivity(), keyword)
+
             this.lifecycleScope.launch {
                 viewModel.setEntireResults(keyword)
 //                viewModel.setSearchResults()
 
-                for (contentItem in viewModel.searchResults.value!!) {
-                    Log.d("ListFragment", "${contentItem}")
+//                binding.recyclerViewSearchResult.adapter = contentAdapter
+//                contentAdapter.submitList(viewModel.searchResults.value)
+
+                requireActivity().runOnUiThread {
+//                    Log.d("ListFragment", "searchResults size= ${viewModel.searchResults.value!!.size}")
+//                    for (contentItem in viewModel.searchResults.value!!) {
+//                        Log.d("ListFragment", "${contentItem}")
+//                    }
+
+
+                    contentAdapter.submitList(viewModel.searchResults.value)
+
+                    val inputMethodManager =
+                        requireActivity().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+
+                    inputMethodManager.hideSoftInputFromWindow(requireActivity().currentFocus?.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+
+//                    contentAdapter.submitList(viewModel.searchResults)
                 }
 
             }

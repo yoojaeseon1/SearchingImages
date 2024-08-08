@@ -1,6 +1,6 @@
 package com.android.searchingimages.presentation
 
-enum class ContentType(type: String) {
-    IMAGE("image"),
-    VIDEO("video")
+enum class ContentType(val type: String) {
+    IMAGE("[Image]"),
+    VIDEO("[Video]")
 }

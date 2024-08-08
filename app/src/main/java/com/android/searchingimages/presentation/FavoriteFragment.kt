@@ -1,11 +1,15 @@
 package com.android.searchingimages.presentation
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
 import com.android.searchingimages.R
+import com.android.searchingimages.databinding.FragmentFavoriteBinding
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -22,8 +26,33 @@ class FavoriteFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
 
+    private var _binding: FragmentFavoriteBinding? = null
+    private val binding get() = _binding!!
+
+    private val viewModel: MainViewModel by lazy {
+        MainViewModel()
+    }
+
+//    private val favoriteAdapter: ContentListAdapter by lazy {
+//        ContentListAdapter{
+//            Log.d("contentListAdapter", "${it}")
+//        }
+//    }
+
+    private val favoriteAdapter: ContentListAdapter by lazy {
+        ContentListAdapter{ contentItem, holder ->
+//            Log.d("favoriteFragment", "${it}")
+            viewModel.deleteFavorite(requireActivity(), contentItem)
+
+        }
+    }
+
+
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.d("FavoriteFragment", "onCreate()")
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
@@ -35,7 +64,46 @@ class FavoriteFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_favorite, container, false)
+        _binding = DataBindingUtil.inflate(inflater, R.layout.fragment_favorite, container, false)
+//        _binding = FragmentFavoriteBinding.inflate(layoutInflater)
+        binding.recyclerViewFavorites.adapter = favoriteAdapter
+        viewModel.setFavorites(requireActivity())
+        Log.d("FavoriteFragment", "favorites size = ${viewModel.favorites.value?.size}")
+        viewModel.favorites.observe(viewLifecycleOwner) {
+            favoriteAdapter.submitList(it.toMutableList())
+//            favoriteAdapter.notifyDataSetChanged()
+        }
+
+        return binding.root
+//        return inflater.inflate(R.layout.fragment_favorite, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        Log.d("FavoriteFragment", "onViewCreated()")
+
+        val requireActivity = requireActivity() as MainActivity
+
+        requireActivity.hideViewPager()
+
+
+//        for (contentItem in viewModel.favorites.value!!) {
+//            Log.d("FavoriteFragment", "${contentItem}")
+//        }
+
+//        Log.d("FavoriteFragment", "favorites size = ${viewModel.favorites.value?.size}")
+
+
+////        contentAdapter.submitList(viewModel.favorites.value)
+//        favoriteAdapter.submitList(viewModel.favorites.value)
+//        favoriteAdapter.submitList(viewModel.favorites.value?.toMutableList())
+
+//        favoriteAdapter.submitList(viewModel.favorites.value)
+//        viewModel.favorites.observe(requireActivity(), Observer {
+//            favoriteAdapter.submitList(it?.toMutableList())
+////            favoriteAdapter.notifyDataSetChanged()
+//        })
     }
 
     companion object {
@@ -57,4 +125,27 @@ class FavoriteFragment : Fragment() {
                 }
             }
     }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d("FavoriteFragment", "onResume()")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.d("FavoriteFragment", "onPause()")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d("FavoriteFragment", "onStop()")
+    }
+
+    override fun onStart() {
+        super.onStart()
+        Log.d("FavoriteFragment", "onStart()")
+    }
+
+
+
 }

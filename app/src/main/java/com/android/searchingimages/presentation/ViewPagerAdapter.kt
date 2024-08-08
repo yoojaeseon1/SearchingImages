@@ -13,4 +13,6 @@ class ViewPagerAdapter(activity: AppCompatActivity) : FragmentStateAdapter(activ
         1 -> FavoriteFragment()
         else -> throw IllegalStateException("invalid position ${position}")
     }
+
+
 }
