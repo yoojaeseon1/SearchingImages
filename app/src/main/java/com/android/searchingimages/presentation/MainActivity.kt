@@ -6,6 +6,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
@@ -28,7 +29,35 @@ class MainActivity : AppCompatActivity(), TabLayout.OnTabSelectedListener {
     }
 
     private val viewModel: MainViewModel by lazy {
-        MainViewModel(contentRepository)
+//        MainViewModel(contentRepository)
+        MainViewModel()
+    }
+
+    private val pageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
+        override fun onPageSelected(position: Int) {
+            super.onPageSelected(position)
+            when(position) {
+                0 -> {
+                    val listFragment = ListFragment()
+
+                    supportFragmentManager
+                        .beginTransaction()
+                        .replace(R.id.frame_layout, listFragment)
+                        .addToBackStack(null)
+                        .commit()
+                }
+                else -> {
+
+                    val favoriteFragment = FavoriteFragment()
+                    supportFragmentManager
+                        .beginTransaction()
+                        .replace(R.id.frame_layout, favoriteFragment)
+                        .addToBackStack(null)
+                        .commit()
+
+                }
+            }
+        }
     }
 
     private lateinit var viewPager: ViewPager2
@@ -49,6 +78,7 @@ class MainActivity : AppCompatActivity(), TabLayout.OnTabSelectedListener {
             tabLayout.addOnTabSelectedListener(this@MainActivity)
             viewPager = pager
             viewPager.adapter = ViewPagerAdapter(this@MainActivity)
+            viewPager.registerOnPageChangeCallback(pageChangeCallback)
             viewPager.offscreenPageLimit = 2
             TabLayoutMediator(tabLayout, viewPager) { tab, position ->
                 tab.text = tabTitles[position]
@@ -84,14 +114,28 @@ class MainActivity : AppCompatActivity(), TabLayout.OnTabSelectedListener {
         if(tab != null) {
             when(tab.position) {
                 0 -> {
-//                    viewPager.setCurrentItem(0, false)
+                    viewPager.setCurrentItem(0, false)
                 }
                 else -> {
-//                    viewPager.setCurrentItem(1, false)
+                    viewPager.setCurrentItem(1, false)
                 }
             }
         }
     }
 
     override fun onTabReselected(tab: TabLayout.Tab?) {    }
+
+    fun showViewPager() = with(binding) {
+        frameLayout.isVisible = false
+        pager.isVisible = true
+//        tabLayout.isVisible = true
+    }
+
+    fun hideViewPager() = with(binding) {
+        frameLayout.isVisible = true
+        pager.isVisible = false
+//        tabLayout.isVisible = false
+    }
+
+//    fun changeFavorite()
 }
