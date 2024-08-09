@@ -19,17 +19,11 @@ import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity(), TabLayout.OnTabSelectedListener {
 
-    private val contentRepository: ContentRepository by lazy{
-        ContentRepository()
-    }
-
     private val binding: ActivityMainBinding by lazy {
-//        ActivityMainBinding.inflate(layoutInflater)
         DataBindingUtil.setContentView(this, R.layout.activity_main)
     }
 
     private val viewModel: MainViewModel by lazy {
-//        MainViewModel(contentRepository)
         MainViewModel()
     }
 
@@ -66,7 +60,6 @@ class MainActivity : AppCompatActivity(), TabLayout.OnTabSelectedListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-//        setContentView(R.layout.activity_main)
         setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -84,16 +77,6 @@ class MainActivity : AppCompatActivity(), TabLayout.OnTabSelectedListener {
                 tab.text = tabTitles[position]
             }.attach()
         }
-
-
-        this.lifecycleScope.launch {
-//            val searchResults = viewModel.setSearchResults("아이브")
-//            Log.d("mainActivity", "results size = ${searchResults.size}")
-//            for (result in searchResults) {
-//                Log.d("mainActivity", "${result}")
-//            }
-        }
-//        contentRepository.searchImageFromAPI(this, contentRepository.setRequestParam("아이브"))
 
     }
 
@@ -128,13 +111,11 @@ class MainActivity : AppCompatActivity(), TabLayout.OnTabSelectedListener {
     fun showViewPager() = with(binding) {
         frameLayout.isVisible = false
         pager.isVisible = true
-//        tabLayout.isVisible = true
     }
 
     fun hideViewPager() = with(binding) {
         frameLayout.isVisible = true
         pager.isVisible = false
-//        tabLayout.isVisible = false
     }
 
 //    fun changeFavorite()

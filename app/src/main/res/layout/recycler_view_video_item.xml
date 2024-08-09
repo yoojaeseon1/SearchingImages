@@ -19,7 +19,6 @@
             android:id="@+id/iv_thumbnail"
             android:layout_width="200dp"
             android:layout_height="130dp"
-            android:background="@drawable/image_spongebob"
             android:scaleType="centerCrop"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent" />

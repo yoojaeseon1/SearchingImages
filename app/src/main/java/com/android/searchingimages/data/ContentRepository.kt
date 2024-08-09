@@ -19,46 +19,14 @@ class ContentRepository {
         )
     }
 
-    //    fun communicateNetwork(context: AppCompatActivity, param: HashMap<String, String>) {
-//    fun searchImageFromAPI(context: AppCompatActivity, param: HashMap<String, String>) : MutableList<ImageDocument> {
-//        var documents = mutableListOf<ImageDocument>()
-//        context.lifecycleScope.launch {
-//            val responseData = NetworkClient.contentNetwork.getImages(param)
-//            documents = responseData.documents
-////            Log.d("content repository", "documents size = ${documents.size}")
-////            for (document in documents) {
-////                Log.d("content repository", "${document}")
-////            }
-//        }
-//        Log.d("content repository", "documents size = ${documents.size}")
-//
-//        return documents
-//
-//    }
-
-//    suspend fun searchImageFromAPI(param: HashMap<String, String>) : MutableList<ImageDocument> {
     suspend fun searchImageFromAPI(param: HashMap<String, String>) : ImageResponse {
         val responseData = NetworkClient.contentNetwork.getImages(param)
-//        return responseData.documents
         return responseData
 
     }
 
-//    fun searchVideoFromAPI(context: AppCompatActivity, param: HashMap<String, String>) {
-//
-//        context.lifecycleScope.launch {
-//            val responseData = NetworkClient.contentNetwork.getVideos(param)
-//            val documents = responseData.documents
-////            for (document in documents) {
-////                Log.d("content repository", "${document}")
-////            }
-//        }
-//    }
-
-//    suspend fun searchVideoFromAPI(param: HashMap<String, String>) : MutableList<VideoDocument> {
     suspend fun searchVideoFromAPI(param: HashMap<String, String>) : VideoResponse {
         val responseData = NetworkClient.contentNetwork.getVideos(param)
-//        return responseData.documents
         return responseData
     }
 
@@ -108,11 +76,8 @@ class ContentRepository {
     }
 
 
-//    fun selectAllFavoriteContents(context: Activity): MutableMap<String, ContentItem> {
     fun selectAllFavoriteContents(context: Activity): MutableList<ContentItem> {
-//        val contentItems = mutableMapOf<String, ContentItem>()
         val contentItems = ArrayList<ContentItem>()
-    Log.d("ContentRepository", "before contentItems hashCode = ${contentItems.hashCode()}")
 
         val pref = context.getSharedPreferences("favorites", 0)
 
@@ -120,24 +85,11 @@ class ContentRepository {
         val gson = Gson()
 
         for (content in allItems) {
-//            contentItems.put(
-//                content.key,
-//                gson.fromJson(content.value as String, ContentItem::class.java)
-//            )
             contentItems.add(
                     gson.fromJson(content.value as String, ContentItem::class.java)
                 )
-
-//        for (contentItem in contentItems) {
-//            Log.d("contentRepository", "${contentItem}")
-//        }
-
         }
 
-        Log.d("ContentRepository", "after contentItems hashCode = ${contentItems.hashCode()}")
-        Log.d("ContentRepository", "after contentItems hashCode = ${contentItems.toMutableList().hashCode()}")
-
-//        return contentItems.toMutableList()
         return mutableListOf<ContentItem>().apply { addAll(contentItems) }
     }
 
