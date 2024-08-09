@@ -22,28 +22,63 @@ class MainViewModel() : ViewModel() {
     val entireResults = mutableListOf<ContentItem>()
 
     private var searchNextIndex = 0
+    var imagePage = 1
+    var videoPage = 1
+    private var isImagePageEnd = false
+    private var isVideoPageEnd = false
 
-    suspend fun setEntireResults(keyword: String){
-        entireResults.clear()
+    suspend fun setEntireResults(keyword: String, context: Activity){
+
+        if(keyword.isEmpty())
+            return
+
+        val searchKeyword = contentRepository.getSearchKeyword(context)
+        if(searchKeyword != keyword) {
+            entireResults.clear()
+            imagePage = 1
+            videoPage = 1
+            isImagePageEnd = false
+            isVideoPageEnd = false
+        }
 
         val imageResults =
-            contentRepository.searchImageFromAPI(contentRepository.setRequestParam(keyword))
+            contentRepository.searchImageFromAPI(contentRepository.setRequestParam(keyword, imagePage))
         val videoResults =
-            contentRepository.searchVideoFromAPI(contentRepository.setRequestParam(keyword))
+            contentRepository.searchVideoFromAPI(contentRepository.setRequestParam(keyword, videoPage))
 
-        entireResults.addAll(contentRepository.convertImageToContentItem(imageResults))
-        entireResults.addAll(contentRepository.convertVideoToContentItem(videoResults))
+        val currentResult = mutableListOf<ContentItem>()
+//        currentResult.addAll(contentRepository.convertImageToContentItem(imageResults))
+//        currentResult.addAll(contentRepository.convertVideoToContentItem(videoResults))
+        currentResult.addAll(contentRepository.convertImageToContentItem(imageResults.documents))
+        currentResult.addAll(contentRepository.convertVideoToContentItem(videoResults.documents))
 
-        entireResults.sortWith{o1, o2 -> o2.datetime.compareTo(o1.datetime)}
+        if(!imageResults.meta.isEnd)
+            imagePage++
+        else
+            isImagePageEnd = true
 
-        if(searchResults.value == null)
-            searchResults.value = mutableListOf()
+        if(!videoResults.meta.isEnd)
+            videoPage++
+        else
+            isVideoPageEnd = true
 
-        searchNextIndex = 0
 
-        searchResults.value?.clear()
-        searchResults.value?.addAll(entireResults.subList(searchNextIndex, searchNextIndex+10))
-        searchNextIndex+=10
+        currentResult.sortWith{o1, o2 -> o2.datetime.compareTo(o1.datetime)}
+        entireResults.addAll(currentResult)
+
+//        entireResults.addAll(contentRepository.convertImageToContentItem(imageResults))
+//        entireResults.addAll(contentRepository.convertVideoToContentItem(videoResults))
+
+//        entireResults.sortWith{o1, o2 -> o2.datetime.compareTo(o1.datetime)}
+
+//        if(searchResults.value == null)
+//            searchResults.value = mutableListOf()
+//
+//        searchNextIndex = 0
+//
+//        searchResults.value?.clear()
+//        searchResults.value?.addAll(entireResults.subList(searchNextIndex, searchNextIndex+10))
+//        searchNextIndex+=10
 //
 //        Log.d("mainViewModel", "searchResult is null = ${searchResults.value == null}")
 
@@ -55,19 +90,25 @@ class MainViewModel() : ViewModel() {
         if(searchResults.value == null)
             searchResults.value = mutableListOf()
 
-        Log.d("mainViewModel", "searchNextIndex = ${searchNextIndex}")
 
-        if(searchNextIndex+10 > entireResults.size)
-            searchResults.value?.addAll(entireResults.subList(searchNextIndex, entireResults.size))
-        else {
-            searchResults.value?.addAll(
-                entireResults.subList(
-                    searchNextIndex,
-                    searchNextIndex + 10
-                )
-            )
-            searchNextIndex+=10
-        }
+
+//        Log.d("mainViewModel", "searchNextIndex = ${searchNextIndex}")
+//
+//
+//        if(searchNextIndex+10 > entireResults.size) {
+//            Log.d("mainViewModel", "over index, searchNextIndex = ${searchNextIndex}")
+//            searchResults.value?.addAll(entireResults.subList(searchNextIndex, entireResults.size))
+//            imagePage++
+//        }
+//        else {
+//            searchResults.value?.addAll(
+//                entireResults.subList(
+//                    searchNextIndex,
+//                    searchNextIndex + 10
+//                )
+//            )
+//            searchNextIndex+=10
+//        }
 
     }
 
@@ -88,6 +129,12 @@ class MainViewModel() : ViewModel() {
 
     fun deleteFavorite(context: Activity, contentItem: ContentItem) {
         contentRepository.deleteFavoriteContent(context, contentItem)
+
+        searchResults.value?.forEach {
+            if(it.thumbnailUrl == contentItem.thumbnailUrl)
+                it.isFavorite = false
+        }
+
         setFavorites(context)
     }
 
