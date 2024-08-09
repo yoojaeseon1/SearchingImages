@@ -6,7 +6,9 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import com.android.searchingimages.R
 import com.android.searchingimages.databinding.FragmentFavoriteBinding
@@ -29,9 +31,11 @@ class FavoriteFragment : Fragment() {
     private var _binding: FragmentFavoriteBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: MainViewModel by lazy {
-        MainViewModel()
-    }
+//    private val viewModel: MainViewModel by lazy {
+//        MainViewModel()
+//    }
+
+    private val viewModel: MainViewModel by activityViewModels()
 
 //    private val favoriteAdapter: ContentListAdapter by lazy {
 //        ContentListAdapter{
@@ -43,7 +47,19 @@ class FavoriteFragment : Fragment() {
         ContentListAdapter{ contentItem, holder ->
 //            Log.d("favoriteFragment", "${it}")
             viewModel.deleteFavorite(requireActivity(), contentItem)
+//            viewModel.saveFavorite(requireActivity(), contentItem)
+//            contentItem.isFavorite = false
 
+//            when(holder) {
+//                is ContentListAdapter.ImageHolder -> {
+//                    val castedHolder = holder as ContentListAdapter.ImageHolder
+//                    castedHolder.favorite.isVisible = false
+//                }
+//                else -> {
+//                    val castedHolder = holder as ContentListAdapter.VideoHolder
+//                    castedHolder.favorite.isVisible = false
+//                }
+//            }
         }
     }
 

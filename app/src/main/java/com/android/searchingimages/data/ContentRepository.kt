@@ -10,11 +10,12 @@ import com.google.gson.Gson
 class ContentRepository {
 
 
-    fun setRequestParam(keyword: String): HashMap<String, String> {
+    fun setRequestParam(keyword: String, page: Int): HashMap<String, String> {
         return hashMapOf(
             "query" to keyword,
             "sort" to "recency",
-            "size" to "40"
+            "size" to "5",
+            "page" to page.toString()
         )
     }
 
@@ -35,9 +36,11 @@ class ContentRepository {
 //
 //    }
 
-    suspend fun searchImageFromAPI(param: HashMap<String, String>) : MutableList<ImageDocument> {
+//    suspend fun searchImageFromAPI(param: HashMap<String, String>) : MutableList<ImageDocument> {
+    suspend fun searchImageFromAPI(param: HashMap<String, String>) : ImageResponse {
         val responseData = NetworkClient.contentNetwork.getImages(param)
-        return responseData.documents
+//        return responseData.documents
+        return responseData
 
     }
 
@@ -52,9 +55,11 @@ class ContentRepository {
 //        }
 //    }
 
-    suspend fun searchVideoFromAPI(param: HashMap<String, String>) : MutableList<VideoDocument> {
+//    suspend fun searchVideoFromAPI(param: HashMap<String, String>) : MutableList<VideoDocument> {
+    suspend fun searchVideoFromAPI(param: HashMap<String, String>) : VideoResponse {
         val responseData = NetworkClient.contentNetwork.getVideos(param)
-        return responseData.documents
+//        return responseData.documents
+        return responseData
     }
 
     fun convertImageToContentItem(
