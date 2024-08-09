@@ -31,40 +31,13 @@ class FavoriteFragment : Fragment() {
     private var _binding: FragmentFavoriteBinding? = null
     private val binding get() = _binding!!
 
-//    private val viewModel: MainViewModel by lazy {
-//        MainViewModel()
-//    }
-
     private val viewModel: MainViewModel by activityViewModels()
-
-//    private val favoriteAdapter: ContentListAdapter by lazy {
-//        ContentListAdapter{
-//            Log.d("contentListAdapter", "${it}")
-//        }
-//    }
 
     private val favoriteAdapter: ContentListAdapter by lazy {
         ContentListAdapter{ contentItem, holder ->
-//            Log.d("favoriteFragment", "${it}")
             viewModel.deleteFavorite(requireActivity(), contentItem)
-//            viewModel.saveFavorite(requireActivity(), contentItem)
-//            contentItem.isFavorite = false
-
-//            when(holder) {
-//                is ContentListAdapter.ImageHolder -> {
-//                    val castedHolder = holder as ContentListAdapter.ImageHolder
-//                    castedHolder.favorite.isVisible = false
-//                }
-//                else -> {
-//                    val castedHolder = holder as ContentListAdapter.VideoHolder
-//                    castedHolder.favorite.isVisible = false
-//                }
-//            }
         }
     }
-
-
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,47 +52,20 @@ class FavoriteFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         _binding = DataBindingUtil.inflate(inflater, R.layout.fragment_favorite, container, false)
-//        _binding = FragmentFavoriteBinding.inflate(layoutInflater)
         binding.recyclerViewFavorites.adapter = favoriteAdapter
         viewModel.setFavorites(requireActivity())
-        Log.d("FavoriteFragment", "favorites size = ${viewModel.favorites.value?.size}")
         viewModel.favorites.observe(viewLifecycleOwner) {
             favoriteAdapter.submitList(it.toMutableList())
-//            favoriteAdapter.notifyDataSetChanged()
         }
 
         return binding.root
-//        return inflater.inflate(R.layout.fragment_favorite, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        Log.d("FavoriteFragment", "onViewCreated()")
-
         val requireActivity = requireActivity() as MainActivity
-
         requireActivity.hideViewPager()
-
-
-//        for (contentItem in viewModel.favorites.value!!) {
-//            Log.d("FavoriteFragment", "${contentItem}")
-//        }
-
-//        Log.d("FavoriteFragment", "favorites size = ${viewModel.favorites.value?.size}")
-
-
-////        contentAdapter.submitList(viewModel.favorites.value)
-//        favoriteAdapter.submitList(viewModel.favorites.value)
-//        favoriteAdapter.submitList(viewModel.favorites.value?.toMutableList())
-
-//        favoriteAdapter.submitList(viewModel.favorites.value)
-//        viewModel.favorites.observe(requireActivity(), Observer {
-//            favoriteAdapter.submitList(it?.toMutableList())
-////            favoriteAdapter.notifyDataSetChanged()
-//        })
     }
 
     companion object {
@@ -141,27 +87,4 @@ class FavoriteFragment : Fragment() {
                 }
             }
     }
-
-    override fun onResume() {
-        super.onResume()
-        Log.d("FavoriteFragment", "onResume()")
-    }
-
-    override fun onPause() {
-        super.onPause()
-        Log.d("FavoriteFragment", "onPause()")
-    }
-
-    override fun onStop() {
-        super.onStop()
-        Log.d("FavoriteFragment", "onStop()")
-    }
-
-    override fun onStart() {
-        super.onStart()
-        Log.d("FavoriteFragment", "onStart()")
-    }
-
-
-
 }
